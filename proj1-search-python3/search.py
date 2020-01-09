@@ -87,7 +87,39 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #util.raiseNotDefined()
+    #print("Start:", problem.getStartState())
+    #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    from collections import namedtuple
+    stack = util.Stack()
+    problem_start_state = problem.getStartState()
+    start_path_instance = namedtuple('path', 'startState path distance')
+    start_path_instance.startState = problem_start_state
+    start_path_instance.path = []
+    start_path_instance.distance = 0
+    stack.push(start_path_instance)
+    visited_paths = []
+    empty_list = set()
+
+    while(stack.isEmpty() == False):
+        current_node = stack.pop()
+        if problem.isGoalState(current_node.startState):
+            return current_node.path
+
+        elif current_node.path not in visited_paths:
+            problem_successors = problem.getSuccessors(current_node.startState)
+            for successor in problem_successors:
+                successor_node = successor[0]
+                if successor_node not in visited_paths:
+                    next_successor = namedtuple('path', 'startState, path, distance')
+                    next_successor.path = []
+                    next_successor.startState = successor_node[0]
+                    next_successor.path.append(current_node.path)
+                    next_successor.path.append([successor[1]])
+                    stack.push(next_successor)
+            visited_paths.append(current_node.startState)
+    return empty_list  
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
