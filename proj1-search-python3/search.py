@@ -92,17 +92,22 @@ def depthFirstSearch(problem):
     #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     
-    #Initializing the fringe and closed set    
+    #Initializing the fringe and closed set  
+    # initialize the stack  
     stack = util.Stack()
+    #have a list for visted_branches
+    visited_branches = []
+    #empty list if nothing able to be returned
+    empty_list = []
+    #get the problem start state
     problem_start_State = problem.getStartState()
+    #path list
     path_list = []
     length = 0 
-    root_tuple = (problem_start_State, path_list, length)
-    stack.push(root_tuple) 
-    visited_branches = []
-    empty_list = []
+    root_info_list = [problem_start_State, path_list, length]
+    stack.push(root_info_list) 
    
-    while True:
+    while(True):
         if(stack.isEmpty == False):
             break
 
@@ -121,8 +126,8 @@ def depthFirstSearch(problem):
                 if(new_node_startState not in visited_branches):
                     new_node_length = successor_node[2]
                     new_node_path = direction + [successor_node[1]]
-                    successor_tuple = (new_node_startState, new_node_path, new_node_length)
-                    stack.push(successor_tuple)
+                    successor_info_list = [new_node_startState, new_node_path, new_node_length]
+                    stack.push(successor_info_list)
 
     return empty_list
 
