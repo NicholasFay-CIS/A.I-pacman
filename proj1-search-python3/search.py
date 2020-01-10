@@ -163,18 +163,24 @@ def breadthFirstSearch(problem):
     problem_start_State = problem.getStartState()
     path_list = []
     length = 0 
-    root_tuple = (problem_start_State, path_list, length)
-    queue.push(root_tuple) 
+    root_info_list = [problem_start_State, path_list, length]
+    queue.push(root_info_list) 
     visited_branches = []
     empty_list = []
+    xy_position = 0
+    #variable to symbolize the path list index in info lists
+    path_ = 1
+    #variable to symbolize length index in info lists
+    length_ = 2
    
     while True:
+
         if(queue.isEmpty == False):
             break
 
         child_node = queue.pop()
-        child_node_xy = child_node[0]
-        direction = child_node[1]
+        child_node_xy = child_node[xy_position]
+        direction = child_node[path_]
         is_goal_state_success = problem.isGoalState(child_node_xy)
 
         if(is_goal_state_success):
@@ -183,12 +189,12 @@ def breadthFirstSearch(problem):
         elif(child_node_xy not in visited_branches):
             visited_branches.append(child_node_xy)
             for successor_node in problem.getSuccessors(child_node_xy):
-                new_node_startState = successor_node[0]
+                new_node_startState = successor_node[xy_position]
                 if(new_node_startState not in visited_branches):
-                    new_node_length = successor_node[2]
-                    new_node_path = direction + [successor_node[1]]
-                    successor_tuple = (new_node_startState, new_node_path, new_node_length)
-                    queue.push(successor_tuple)
+                    new_node_length = successor_node[length_]
+                    new_node_path = direction + [successor_node[path_]]
+                    successor_info_list = [new_node_startState, new_node_path, new_node_length]
+                    queue.push(successor_info_list)
     return empty_list
 
 def uniformCostSearch(problem):
