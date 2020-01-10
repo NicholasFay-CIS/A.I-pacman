@@ -200,7 +200,36 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    pQueue = util.PriorityQueue()       #frontier
+    problem_start_state = problem.getStartState()      #initial node
+    length = 0
+    path_list = []
+    root_list = [problem_start_state, path_list, 0]   #priority for the root node is 0
+    pQueue.push(root_list, 0)
+    visited_branches = []           #nodes that have been visited
+    while(True):
+        if (pQueue.isEmpty()):
+            return False
+        child_node = pQueue.pop()
+        child_node_xy = child_node[0]
+        direction = child_node[1]
+        if (problem.isGoalState(child_node_xy)):
+            return direction
+        elif(child_node_xy not in visited_branches):
+            visited_branches.append(child_node_xy)
+            for successor_node in problem.getSuccessors(child_node_xy):
+                new_node_startState = successor_node[0]
+                if(new_node_startState not in visited_branches):
+                    new_node_length = successor_node[2]
+                    print(direction)
+                    #cost = successor_node.getCostOfActions(direction)
+                    #print(cost)
+                    new_node_path = direction + [successor_node[1]]
+                    #new_node_priority = priority + successor_node
+                    #print(cost)
+            
+                
+
 
 def nullHeuristic(state, problem=None):
     """
