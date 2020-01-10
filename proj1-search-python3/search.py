@@ -204,7 +204,7 @@ def uniformCostSearch(problem):
     problem_start_state = problem.getStartState()      #initial node
     length = 0
     path_list = []
-    root_list = [problem_start_state, path_list, 0]   #priority for the root node is 0
+    root_list = [problem_start_state, path_list]   #priority for the root node is 0
     pQueue.push(root_list, 0)
     visited_branches = []           #nodes that have been visited
     while(True):
@@ -220,14 +220,13 @@ def uniformCostSearch(problem):
             for successor_node in problem.getSuccessors(child_node_xy):
                 new_node_startState = successor_node[0]
                 if(new_node_startState not in visited_branches):
-                    new_node_length = successor_node[2]
-                    print(direction)
-                    #cost = successor_node.getCostOfActions(direction)
-                    #print(cost)
                     new_node_path = direction + [successor_node[1]]
-                    #new_node_priority = priority + successor_node
-                    #print(cost)
-            
+                    new_node_priority = successor_node[2]
+                    new_node_list = [new_node_startState, new_node_path]
+                    pQueue.push(new_node_list, new_node_priority)
+                elif(new_node_startState in visited_branches):
+                    pQueue.update(successor_node, new_node_priority)
+
                 
 
 
