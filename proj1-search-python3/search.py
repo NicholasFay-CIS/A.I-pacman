@@ -91,35 +91,40 @@ def depthFirstSearch(problem):
     #print("Start:", problem.getStartState())
     #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    from collections import namedtuple
+    
+    #Initializing the fringe and closed set    
     stack = util.Stack()
-    problem_start_state = problem.getStartState()
-    start_path_instance = namedtuple('path', 'startState path distance')
-    start_path_instance.startState = problem_start_state
-    start_path_instance.path = []
-    start_path_instance.distance = 0
-    stack.push(start_path_instance)
-    visited_paths = []
-    empty_list = set()
+    problem_start_State = problem.getStartState()
+    path_list = []
+    length = 0 
+    root_tuple = (problem_start_State, path_list, length)
+    stack.push(root_tuple) 
+    visited_branches = []
+    empty_list = []
+   
+    while True:
+        if(stack.isEmpty == False):
+            break
 
-    while(stack.isEmpty() == False):
-        current_node = stack.pop()
-        if problem.isGoalState(current_node.startState):
-            return current_node.path
+        child_node = stack.pop()
+        child_node_xy = child_node[0]
+        direction = child_node[1]
+        is_goal_state_success = problem.isGoalState(child_node_xy)
 
-        elif current_node.path not in visited_paths:
-            problem_successors = problem.getSuccessors(current_node.startState)
-            for successor in problem_successors:
-                successor_node = successor[0]
-                if successor_node not in visited_paths:
-                    next_successor = namedtuple('path', 'startState, path, distance')
-                    next_successor.path = []
-                    next_successor.startState = successor_node[0]
-                    next_successor.path.append(current_node.path)
-                    next_successor.path.append([successor[1]])
-                    stack.push(next_successor)
-            visited_paths.append(current_node.startState)
-    return empty_list  
+        if(is_goal_state_success):
+            return direction
+        
+        elif(child_node_xy not in visited_branches):
+            visited_branches.append(child_node_xy)
+            for successor_node in problem.getSuccessors(child_node_xy):
+                new_node_startState = successor_node[0]
+                if(new_node_startState not in visited_branches):
+                    new_node_length = successor_node[2]
+                    new_node_path = direction + [successor_node[1]]
+                    successor_tuple = (new_node_startState, new_node_path, new_node_length)
+                    stack.push(successor_tuple)
+
+    return empty_list
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
