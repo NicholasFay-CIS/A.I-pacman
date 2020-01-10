@@ -88,11 +88,11 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     #util.raiseNotDefined()
-    #print("Start:", problem.getStartState())
-    #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    
-    #Initializing the fringe and closed set  
+
+    print("Start:", problem.getStartState())
+    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+
     # initialize the stack  
     stack = util.Stack()
     #have a list for visted_branches
@@ -103,32 +103,57 @@ def depthFirstSearch(problem):
     problem_start_State = problem.getStartState()
     #path list
     path_list = []
+    #length
     length = 0 
+    #variable to symbolize start state xy position index in info lists
+    xy_position = 0
+    #variable to symbolize the path list index in info lists
+    path_ = 1
+    #variable to symbolize length index in info lists
+    length_ = 2
+    #create the root info list with the start state, path list (of directions) and length
     root_info_list = [problem_start_State, path_list, length]
+    #push the info list onto the stack
     stack.push(root_info_list) 
    
+   #Forever loop
     while(True):
+        #if the stack is empty break out of the loop
         if(stack.isEmpty == False):
             break
-
+        #retrieve a child node
         child_node = stack.pop()
-        child_node_xy = child_node[0]
-        direction = child_node[1]
+        #get child node position
+        child_node_xy = child_node[xy_position]
+        #get child node direction
+        direction = child_node[path_]
+        #check is goal state of child node position 
         is_goal_state_success = problem.isGoalState(child_node_xy)
 
+        #if the goal state is a success return the direction
         if(is_goal_state_success):
             return direction
-        
+        #if the goal state is not a success 
         elif(child_node_xy not in visited_branches):
+            #append the position to visited branches
             visited_branches.append(child_node_xy)
-            for successor_node in problem.getSuccessors(child_node_xy):
-                new_node_startState = successor_node[0]
+            #get the successors of the child nodes position
+            successors = problem.getSuccessors(child_node_xy)
+            #iterate through each successor node
+            for successor_node in successors:
+                #get that nodes start state
+                new_node_startState = successor_node[xy_position]
+                #if the start state is not been visited
                 if(new_node_startState not in visited_branches):
-                    new_node_length = successor_node[2]
-                    new_node_path = direction + [successor_node[1]]
+                    #get the nodes length
+                    new_node_length = successor_node[length_]
+                    #get the nodes directions
+                    new_node_path = direction + [successor_node[path_]]
+                    #create the successor info list
                     successor_info_list = [new_node_startState, new_node_path, new_node_length]
+                    #push the successor info list to the stack
                     stack.push(successor_info_list)
-
+    #if the stack was empty return an empty list
     return empty_list
 
 def breadthFirstSearch(problem):
