@@ -92,7 +92,8 @@ def depthFirstSearch(problem):
     print("Start:", problem.getStartState())
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-
+    #import named tuple data structure
+    from collections import namedtuple
     # initialize the stack  
     stack = util.Stack()
     #have a list for visted_branches
@@ -112,21 +113,24 @@ def depthFirstSearch(problem):
     #variable to symbolize length index in info lists
     length_ = 2
     #create the root info list with the start state, path list (of directions) and length
-    root_info_list = [problem_start_State, path_list, length]
+    root_info = namedtuple('root', 'startState path_list length')
+    root_info.startState = problem_start_State
+    root_info.path_list = path_list
+    root_info.length = length
     #push the info list onto the stack
-    stack.push(root_info_list) 
+    stack.push(root_info) 
    
    #Forever loop
     while(True):
         #if the stack is empty break out of the loop
-        if(stack.isEmpty == False):
+        if(stack.isEmpty() == True):
             break
         #retrieve a child node
         child_node = stack.pop()
         #get child node position
-        child_node_xy = child_node[xy_position]
+        child_node_xy = child_node.startState
         #get child node direction
-        direction = child_node[path_]
+        direction = child_node.path_list
         #check is goal state of child node position 
         is_goal_state_success = problem.isGoalState(child_node_xy)
 
@@ -150,9 +154,12 @@ def depthFirstSearch(problem):
                     #get the nodes directions
                     new_node_path = direction + [successor_node[path_]]
                     #create the successor info list
-                    successor_info_list = [new_node_startState, new_node_path, new_node_length]
+                    successor_info = namedtuple('successor', 'startState path_list length')
+                    successor_info.startState = new_node_startState
+                    successor_info.path_list = new_node_path
+                    successor_info.length = new_node_length
                     #push the successor info list to the stack
-                    stack.push(successor_info_list)
+                    stack.push(successor_info)
     #if the stack was empty return an empty list
     return empty_list
 
@@ -175,7 +182,7 @@ def breadthFirstSearch(problem):
    
     while True:
 
-        if(queue.isEmpty == False):
+        if(queue.isEmpty == True):
             break
 
         child_node = queue.pop()
