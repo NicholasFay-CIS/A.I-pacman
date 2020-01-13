@@ -289,7 +289,8 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
         #list of all visted corners, since no corner has been visited yet, they are all set to False
-        self.visitedCorners = [False, False, False, False]
+        self.visitedCorners = []
+        self.cost = 1
 
     def getStartState(self):
         """
@@ -297,8 +298,7 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        self.visitedCorners[0] = self.startingPosition
-        return self.visitedCorners
+        return self.startingPosition
 
     def isGoalState(self, state):
         """
@@ -324,15 +324,19 @@ class CornersProblem(search.SearchProblem):
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
             "*** YOUR CODE HERE ***"
-            x,y = state[0]
+            x = state[0]
+            y = state[1]
             dx, dy = Actions.directionToVector(action)
             next_x, next_y = int(x + dx), int(y + dy)
             hitsWall = self.walls[next_x][next_y]
             if(hitsWall == False):
                 next_pos_tuple = (next_x, next_y)
-                next_tuple = ((next_pos_tuple, action, 1))
+                next_tuple = ((next_pos_tuple, action, self.cost))
                 successors.append(next_tuple)
+                
         self._expanded += 1 # DO NOT CHANGE
+        if state not in self.visitedCorners:
+            self.visitedCorners.append(state)
         return successors
 
     def getCostOfActions(self, actions):
