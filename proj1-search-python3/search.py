@@ -182,7 +182,7 @@ def breadthFirstSearch(problem):
    
     while True:
 
-        if(queue.isEmpty == True):
+        if(queue.isEmpty() == True):
             break
 
         child_node = queue.pop()
