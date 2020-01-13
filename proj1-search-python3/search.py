@@ -240,9 +240,9 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     pQueue = util.PriorityQueue()       #frontier
     problem_start_state = problem.getStartState()      #initial node
-    length = 0
+    cost = 0
     path_list = []
-    root_list = [problem_start_state, path_list, length]   #priority for the root node is 0
+    root_list = [problem_start_state, path_list, cost]   #priority for the root node is 0
     pQueue.push(root_list, 0)
     visited_branches = []           #nodes that have been visited
     while(True):
@@ -266,8 +266,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                     successor_cost = successor_node[2]
                     parent_child_cost = parent_node_cost + successor_cost
                     new_node_list = [new_node_startState, new_node_path, parent_child_cost]
-                    print(new_node_list[2])
-                    total_cost = new_node_list[2] + heuristic(new_node_startState[0], problem)
+                    total_cost = new_node_list[2] + heuristic(new_node_startState, problem)
                     pQueue.push(new_node_list, total_cost)
                 elif(new_node_startState in visited_branches):
                     pQueue.update(successor_node, total_cost)
