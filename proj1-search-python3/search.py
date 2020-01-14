@@ -131,6 +131,7 @@ def depthFirstSearch(problem):
                         successor_length = successor[length_index] #get the successors length
                         #check if the successors start state has already been recorded
                         if(successor_start_state in expanded_nodes):
+                            #if so continue to the next successor node
                             continue
                         #otherwise it has not been recorded
                         else:
