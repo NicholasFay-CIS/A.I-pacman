@@ -18,6 +18,8 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+#import named tuple data structure
+from collections import namedtuple
 
 class SearchProblem:
     """
@@ -92,8 +94,6 @@ def depthFirstSearch(problem):
     print("Start:", problem.getStartState())
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    #import named tuple data structure
-    from collections import namedtuple
     # initialize the stack  
     stack = util.Stack()
     #have a list for visted_branches
@@ -112,12 +112,12 @@ def depthFirstSearch(problem):
     path_ = 1
     #variable to symbolize length index in info lists
     length_ = 2
-    #create the root info list with the start state, path list (of directions) and length
+    #create the root info tuple which includes the start state, path list (of directions) and length
     root_info = namedtuple('root', 'startState path_list length')
     root_info.startState = problem_start_State
     root_info.path_list = path_list
     root_info.length = length
-    #push the info list onto the stack
+    #push the info tuple onto the stack, INITIAL PUSH
     stack.push(root_info) 
    
    #Forever loop
@@ -145,7 +145,7 @@ def depthFirstSearch(problem):
             successors = problem.getSuccessors(child_node_xy)
             #iterate through each successor node
             for successor_node in successors:
-                #get that nodes start state
+                #get the nodes start state
                 new_node_startState = successor_node[xy_position]
                 #if the start state is not been visited
                 if(new_node_startState not in visited_branches):
@@ -153,7 +153,7 @@ def depthFirstSearch(problem):
                     new_node_length = successor_node[length_]
                     #get the nodes directions
                     new_node_path = direction + [successor_node[path_]]
-                    #create the successor info list
+                    #create the successor info tuple
                     successor_info = namedtuple('successor', 'startState path_list length')
                     successor_info.startState = new_node_startState
                     successor_info.path_list = new_node_path
