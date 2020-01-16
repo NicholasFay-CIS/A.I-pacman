@@ -289,23 +289,20 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
         self.cost = 1
-        self.visited = list()
 
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        "*** YOUR CODE HERE ***"
-        return [self.startingPosition, []]
+        return [self.startingPosition, []] #start state & list of visited corners
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        "*** YOUR CODE HERE ***"
         num_visited_corners = len(state[1])
-        return num_visited_corners == 4
+        return num_visited_corners == 4     #must run until all 4 corners have been visited
 
     def getSuccessors(self, state):
         """
@@ -319,20 +316,19 @@ class CornersProblem(search.SearchProblem):
         """
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
-            "*** MY CODE BEGINS HERE ***"
             x, y = state[0] 
-            visited_corners = state[1]
+            visited_corners = state[1] #list of visited corners
             dx, dy = Actions.directionToVector(action) 
             nextx, nexty = int(x + dx), int(y + dy) 
             hitsWall = self.walls[nextx][nexty]
             next_position = (nextx, nexty)
             if (hitsWall):
                 continue
-            elif(next_position in self.corners and not next_position in visited_corners): 
+            elif(next_position in self.corners and not next_position in visited_corners): #case where the next position is an unvisited corner
                 visited_corners = list(visited_corners)
-                visited_corners.append(next_position)
-                self.visited = visited_corners
-            successors.append(((next_position, visited_corners), action, self.cost))
+                visited_corners.append(next_position)   #add new position to list of visited corners
+            #append next position with a potentially updated visited corners list
+            successors.append(((next_position, visited_corners), action, self.cost)) 
         self._expanded += 1 
         return successors
 
@@ -365,7 +361,6 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
     "*** YOUR CODE HERE ***"
     return 0 # Default to trivial solution
 
