@@ -289,7 +289,7 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
         #list of all visted corners, since no corner has been visited yet, they are all set to False
-        self.visited_corners = 0
+        self.visited_corners = []
         self.cost = 1
 
     def getStartState(self):
@@ -298,14 +298,14 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        return [self.startingPosition, []]
+        return [self.startingPosition, self.visited_corners]
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        return self.visited_corners == 4
+        return len(state[1]) == 4
 
     def getSuccessors(self, state):
         """
@@ -321,19 +321,17 @@ class CornersProblem(search.SearchProblem):
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             "*** MY CODE BEGINS HERE ***"
             x, y = state[0] 
+            visited_corners = state[1]
             dx, dy = Actions.directionToVector(action) 
             nextx, nexty = int(x + dx), int(y + dy) 
             hitsWall = self.walls[nextx][nexty]
             next_position = (nextx, nexty)
-            if (hitsWall == False): #if we didn't hit a wall
-                if (next_position in self.corners and next_position not in state[1]): 
-                    addCorner = [] + state[1]
-                    addCorner.append(next_position)
-                    next_tuple = ((next_position, addCorner), action, self.cost) 
-                    self.visited_corners += 1
-                    successors.append(next_tuple) 
-                else:    
-                    successors.append(((next_position, state[1]), action, self.cost))
+            if (hitsWall == True):
+                continue
+            elif(next_position in self.corners and next_position not in visited_corners): 
+                    visited_corners = [visited_corners]
+                    visited_corners.append(next_position)
+            successors.append(((next_position, visited_corners), action, self.cost))
         self._expanded += 1 
         return successors
 
