@@ -358,11 +358,13 @@ def cornersHeuristic(state, problem):
     This function should always return a number that is a lower bound on the
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
-    """
+    "*** YOUR CODE HERE ***"
+  """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
     "*** YOUR CODE HERE ***"
     return 0
+
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -516,6 +518,7 @@ def foodHeuristic(state, problem):
     
     return best_dist
 
+
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
     def registerInitialState(self, state):
@@ -543,9 +546,7 @@ class ClosestDotSearchAgent(SearchAgent):
         food = gameState.getFood()
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
-
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return search.breadthFirstSearch(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -572,31 +573,32 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         self.startState = gameState.getPacmanPosition()
         self.costFn = lambda x: 1
         self._visited, self._visitedlist, self._expanded = {}, [], 0 # DO NOT CHANGE
-
     def isGoalState(self, state):
         """
         The state is Pacman's position. Fill this in with a goal test that will
         complete the problem definition.
         """
         x,y = state
+        menu = self.food.asList()
+        for food in menu:
+            if (food == (x,y)):
+                return True
+        return False
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+    def mazeDistance(point1, point2, gameState):
+        """
+        Returns the maze distance between any two points, using the search functions
+        you have already built. The gameState can be any game state -- Pacman's
+        position in that state is ignored.
 
-def mazeDistance(point1, point2, gameState):
-    """
-    Returns the maze distance between any two points, using the search functions
-    you have already built. The gameState can be any game state -- Pacman's
-    position in that state is ignored.
+        Example usage: mazeDistance( (2,4), (5,6), gameState)
 
-    Example usage: mazeDistance( (2,4), (5,6), gameState)
-
-    This might be a useful helper function for your ApproximateSearchAgent.
-    """
-    x1, y1 = point1
-    x2, y2 = point2
-    walls = gameState.getWalls()
-    assert not walls[x1][y1], 'point1 is a wall: ' + str(point1)
-    assert not walls[x2][y2], 'point2 is a wall: ' + str(point2)
-    prob = PositionSearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=False)
-    return len(search.bfs(prob))
+        This might be a useful helper function for your ApproximateSearchAgent.
+        """
+        x1, y1 = point1
+        x2, y2 = point2
+        walls = gameState.getWalls()
+        assert not walls[x1][y1], 'point1 is a wall: ' + str(point1)
+        assert not walls[x2][y2], 'point2 is a wall: ' + str(point2)
+        prob = PositionSearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=False)
+        return len(search.bfs(prob))
