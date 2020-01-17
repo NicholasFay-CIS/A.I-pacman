@@ -367,7 +367,7 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    return 0
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -459,9 +459,67 @@ def foodHeuristic(state, problem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+    #get the position of pac man and the food grid from the state
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    #list of all food in the state space
+    foods = foodGrid.asList()
+    #get pac mans x and y position
+    pac_x, pac_y = position
+    #list of max : min x positions
+    x_position = [0, 0]
+    #list of max : min y positions
+    y_position = [0, 0]
+    #variables for indecies
+    max_index = 0
+    min_index = 1
+    x_index = 0
+    y_index = 1
+    #set i to 0 to start at the first index in the list
+    i = 0
+    for i in range(len(foods)):
+        #get the x position
+        x_food = foods[i][x_index]
+        #get the foods x position distance from pac man
+        dist_to_food_x = x_food - pac_x
+        #is the distance the max or the min
+        is_max = dist_to_food_x > x_position[max_index]
+        is_min = dist_to_food_x < x_position[min_index]
+        #if its the min set the new min in the list and continue to next
+        #since it cant be a min and a max
+        if(is_min):
+            x_position[min_index] = dist_to_food_x
+            continue
+        #if its the max set the new max in the list
+        if(is_max):
+            x_position[max_index] = dist_to_food_x
+    #reset i to loop through and get all the y calculations now
+    i = 0
+    #calculate the delta x (dx - x) where dx here is the max and x is the min
+    delta_x = x_position[max_index] - x_position[min_index]
+    #loop through the y coordinates 
+    for i in range(len(foods)):
+        #fet the y food position
+        y_food = foods[i][y_index]
+        #calcuate the distance from pac man y to food y
+        dist_to_food_y = y_food - pac_y
+        #is it a max or a min 
+        is_max = dist_to_food_y > y_position[max_index]
+        is_min = dist_to_food_y < y_position[min_index]
+        #if its a min set the min and continue
+        if(is_min):
+            y_position[min_index] = dist_to_food_y
+            continue
+        #if its the max set the max entry in the list
+        if(is_max):
+            y_position[max_index] = dist_to_food_y
+    #calculate delta y the same as delta x
+    delta_y = y_position[max_index] - y_position[min_index]
+
+    #calculate and returnthe best distance (add the two deltas)
+    best_dist = delta_x + delta_y
+    
+    return best_dist
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
