@@ -324,9 +324,11 @@ class CornersProblem(search.SearchProblem):
             next_position = (nextx, nexty)
             if (hitsWall):
                 continue
-            elif(next_position in self.corners and not next_position in visited_corners): #case where the next position is an unvisited corner
+            #case where the next position is an unvisited corner
+            elif(next_position in self.corners and not next_position in visited_corners): 
+                #add new position to list of visited corners
                 visited_corners = list(visited_corners)
-                visited_corners.append(next_position)   #add new position to list of visited corners
+                visited_corners.append(next_position)   
             #append next position with a potentially updated visited corners list
             successors.append(((next_position, visited_corners), action, self.cost)) 
         self._expanded += 1 
@@ -360,26 +362,28 @@ def cornersHeuristic(state, problem):
     admissible (as well as consistent).
     "*** YOUR CODE HERE ***"
   """ 
-    curr_state = state[0]
-    heur_meta = 0
+    curr_state = state[0]   #current position
+    heur_meta = 0       #heuristic value
     corners = problem.corners # These are the corner coordinates
     remaining_corners = []
     for corner in corners:
+        #check which corners have already been visited
         if corner not in state[1]:
             remaining_corners.append(corner)
     while (True):
         if(len(remaining_corners) == 0):
+            #if there are no remaining corners, there are no further calculations required
             break
         min_path = 99999999
         closest_corner = 99999999
         for corner in remaining_corners:
+            #find the corner that is closest to the current position
             path_length = util.manhattanDistance(curr_state, corner)
             if (path_length < min_path):
                 min_path = path_length
                 closest_corner = corner
-        heur_meta += min_path
+        heur_meta += min_path   #add the cost to get to the closest corner
         curr_state = closest_corner
-        print(remaining_corners)
         remaining_corners.remove(closest_corner)
 
     return heur_meta
@@ -560,9 +564,9 @@ class ClosestDotSearchAgent(SearchAgent):
         gameState.
         """
         # Here are some useful elements of the startState
-        startPosition = gameState.getPacmanPosition()
-        food = gameState.getFood()
-        walls = gameState.getWalls()
+        #startPosition = gameState.getPacmanPosition()
+        #food = gameState.getFood()
+        #walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
         return search.breadthFirstSearch(problem)
 
@@ -600,6 +604,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         menu = self.food.asList()
         for food in menu:
             if (food == (x,y)):
+                #it is a goal state if there is food there
                 return True
         return False
 
