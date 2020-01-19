@@ -252,7 +252,8 @@ def uniformCostSearch(problem):
                         #add the current path cost to the cost required to move to the child
                         successor_info.cost = child_node_cost + successor_node[cost_index]
                         if (successor_info.start_state in visited_branches):
-                                continue
+                                #update if a path with a lower cost has been found
+                                pQueue.update(successor_info, successor_info.cost)
                         else:
                             #if the node has not yet been visited, put it on the queue
                             pQueue.push(successor_info, successor_info.cost)
@@ -273,44 +274,48 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     pQueue = util.PriorityQueue()       #frontier
     problem_start_state = problem.getStartState()      #initial node
     cost = 0
-    path_list = []
-    root_list = [problem_start_state, path_list, cost]   #priority for the root node is 0
-    pQueue.push(root_list, 0)
-    visited_branches = []           #nodes that have been visited
+    empty_path_list = []
+    root_info= namedtuple('root', 'start_state path_list cost')
+    root_info.start_state = problem_start_state
+    root_info.path_list = empty_path_list
+    root_info.cost = cost   #cost of root node is 0
+    pQueue.push(root_info, root_info.cost)
     start_state_index = 0
     path_list_index = 1
     cost_index = 2
+    visited_branches = []           #nodes that have been visited
     while(True):
         if (pQueue.isEmpty()):
             #if the queue is empty break and return the empty list
             break
+        else:
+            child_node = pQueue.pop()
+            child_node_xy = child_node.start_state
+            direction = child_node.path_list
+            child_cost = child_node.cost
 
-        child_node = pQueue.pop()
-        child_node_xy = child_node[0]
-        direction = child_node[1]
-
-        if (problem.isGoalState(child_node_xy)):
-            #check to see if the child is the goal, if so simply return the path to it
-            return direction
-
-        elif(child_node_xy not in visited_branches):
-            visited_branches.append(child_node_xy)
-            for successor_node in problem.getSuccessors(child_node_xy):
-                new_node_startState = successor_node[start_state_index]
-                new_node_path = direction + [successor_node[path_list_index]]
-                parent_node_cost = child_node[cost_index]
-                #similar to UCS, update child cost
-                successor_cost = successor_node[cost_index]
-                parent_child_cost = parent_node_cost + successor_cost
-                new_node_list = [new_node_startState, new_node_path, parent_child_cost]
-                #total cost must be calculated using the heuristic
-                total_cost = new_node_list[cost_index] + heuristic(new_node_startState, problem)
-                if(new_node_startState not in visited_branches):
-                    #if the node is not visited, add it to the queue to be expanded
-                    pQueue.push(new_node_list, total_cost)
-                elif(new_node_startState in visited_branches):
-                    #update path to node if there is a lower cost to get there
-                    pQueue.update(successor_node, total_cost)
+            if (problem.isGoalState(child_node_xy)):
+                #check to see if the child is the goal, if so simply return the path to it
+                return direction
+            else:
+                if (child_node_xy in visited_branches):
+                    continue
+                else:
+                    visited_branches.append(child_node_xy)
+                    for successor_node in problem.getSuccessors(child_node_xy):
+                        successor_info = namedtuple ('succ', 'start_state path_list cost')
+                        successor_info.start_state = successor_node[start_state_index]
+                        successor_info.path_list = direction + [successor_node[path_list_index]]
+                        #similar to UCS, update child cost
+                        successor_info.cost = child_cost + successor_node[cost_index]
+                        #total cost must be calculated using the heuristic
+                        total_cost = successor_info.cost + heuristic(successor_info.start_state, problem)
+                        if(successor_info.start_state in visited_branches):
+                            #if the node is not visited, add it to the queue to be expanded
+                            pQueue.update(successor_info, total_cost)
+                        else:
+                            #update path to node if there is a lower cost to get there
+                            pQueue.push(successor_info, total_cost)
     return
 
 
