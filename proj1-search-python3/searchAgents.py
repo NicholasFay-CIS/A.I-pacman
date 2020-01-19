@@ -364,7 +364,7 @@ def cornersHeuristic(state, problem):
   """ 
     curr_state = state[0]   #current position
     heur_meta = 0       #heuristic value
-    corners = problem.corners # These are the corner coordinates
+    corners = problem.corners # corner coordinates tuples
     remaining_corners = []
     for corner in corners:
         #check which corners have already been visited
