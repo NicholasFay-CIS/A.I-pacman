@@ -81,7 +81,6 @@ class ReflexAgent(Agent):
         if (action == "Stop"):
            return -9999999
 
-
         for mob in newGhostStates:
             ghost = mob.getPosition()
             currentGhostDist = manhattanDistance(ghost, curPacman)
@@ -106,10 +105,6 @@ class ReflexAgent(Agent):
             return min(distFromFood)
         except:
             return 2
-
-            
-
-        
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -170,7 +165,36 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        neg_infinity = -9999999
+        pac_man_actions = gameState.getLegalActions(0)
+        values = list()
+        for action in pac_man_actions:
+            curr_depth = 0
+            get_successor_move = gameState.generateSuccessor(0, action, curr_depth)
+            next_state = get_successor_move
+            next_value = self.get_value(next_state, 1, 0)
+            values.append(next_value)
+        return max(values)
+
+    def get_value(self, gameState, agent, init_depth):
+        from collections import namedtuple
+        terminal_states = namedtuple('terminal', 'win lose')
+        terminal_states.win = gameState.isWin()
+        terminal_states.lose = gameState.isLose()
+        if(terminal_states.win == True):
+            return self.evaluationFunction(gameState)
+        if(terminal_states.lose == True):
+            return self.evaluationFunction(gameState)
+        if(not self.depth):
+            return self.evaluationFunction(gameState)
+        if(agent):
+            return self.min_value(gameState, init_depth)
+        return self.max_value(gameState, init_depth)
+
+    def max_value(self, gameState, agent, init_depth):
+
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
