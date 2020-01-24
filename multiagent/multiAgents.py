@@ -192,7 +192,13 @@ class MinimaxAgent(MultiAgentSearchAgent):
             return self.min_value(gameState, init_depth)
         return self.max_value(gameState, init_depth)
 
-    def max_value(self, gameState, agent, init_depth):
+    def max_value(self, gameState, depth):
+        maxVal = -999999
+        for action in gameState.getLegalActions(0):
+            successor = gameState.generateSuccessor(0, action)
+            newVal = self.get_value(successor, depth, 1)
+            maxVal = max(maxVal, newVal)
+        return maxVal
 
 
 
