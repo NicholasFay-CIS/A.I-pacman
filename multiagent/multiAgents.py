@@ -221,14 +221,16 @@ class MinimaxAgent(MultiAgentSearchAgent):
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     Your minimax agent with alpha-beta pruning (question 3)
-    """
+    
 
     def getAction(self, gameState):
-        """
+        
         Returns the minimax action using self.depth and self.evaluationFunction
-        """
+       
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        util.raiseNotDefined() """
+        
+   
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
@@ -243,7 +245,55 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        max_val = -9999999
+        pac_man_actions = gameState.getLegalActions(0)
+        best_action = None
+        for action in pac_man_actions:
+            curr_depth = 0
+            gamestate_successor_move = gameState.generateSuccessor(0, action)
+            new_value = self.get_value(gamestate_successor_move, curr_depth, 1)
+            max_value = max(new_value, max_val)
+            if(max_value == new_value):
+                max_val = new_value
+                best_action = action
+        return best_action
+
+    def get_value(self, gameState, init_depth, agent):
+        terminal_states = namedtuple('terminal', 'win lose')
+        terminal_states.win = gameState.isWin()
+        terminal_states.lose = gameState.isLose()
+        if(terminal_states.win == True):
+            return self.evaluationFunction(gameState)
+        if(terminal_states.lose == True):
+            return self.evaluationFunction(gameState)
+        if(init_depth == self.depth):
+            return self.evaluationFunction(gameState)
+        if(agent):
+            return self.avg_value(gameState, init_depth, agent)
+        return self.max_value(gameState, init_depth)
+
+    def max_value(self, gameState, currentDepth):
+        maxVal = -999999
+        for action in gameState.getLegalActions(0):
+            successor = gameState.generateSuccessor(0, action)
+            newVal = self.get_value(successor, currentDepth, 1)
+            if (newVal > maxVal):
+                maxVal = newVal
+        return maxVal
+
+    def avg_value(self, gameState, currentDepth, agntInd):
+        avgVal = 0
+        numAgents = gameState.getNumAgents() - 1
+        for action in gameState.getLegalActions(agntInd):
+            if agntInd == numAgents:
+                successor = gameState.generateSuccessor(agntInd, action)
+                newVal = self.get_value(successor, currentDepth + 1, 0)
+                avgVal += newVal
+            else:
+                successor = gameState.generateSuccessor(agntInd, action)
+                newVal = self.get_value(successor, currentDepth, agntInd + 1)
+                avgVal += newVal
+        return avgVal
 
 def betterEvaluationFunction(currentGameState):
     """
@@ -253,7 +303,6 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
 
 # Abbreviation
 better = betterEvaluationFunction
