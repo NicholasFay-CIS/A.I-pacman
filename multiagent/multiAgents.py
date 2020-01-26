@@ -192,8 +192,31 @@ class MinimaxAgent(MultiAgentSearchAgent):
         if(init_depth == self.depth):
             return self.evaluationFunction(gameState)
         if(agent):
-            return self.min_value(gameState, init_depth)
+            return self.min_value(gameState, init_depth, agent)
         return self.max_value(gameState, init_depth)
+
+    def max_value(self, gameState, depth):
+        maxVal = -999999
+        for action in gameState.getLegalActions(0):
+            successor = gameState.generateSuccessor(0, action)
+            newVal = self.get_value(successor, depth, 1)
+            maxVal = max(maxVal, newVal)
+        return maxVal
+
+    def min_value(self, gameState, currentDepth, agntInd):
+        minVal = 999999
+        numAgents = gameState.getNumAgents() - 1
+        for action in gameState.getLegalActions(agntInd):
+            if agntInd == numAgents:
+                successor = gameState.generateSuccessor(agntInd, action)
+                newVal = self.get_value(successor, currentDepth + 1, 0)
+                minVal = min(minVal, newVal)
+            else:
+                successor = gameState.generateSuccessor(agntInd, action)
+                newVal = self.get_value(successor, currentDepth, agntInd + 1)
+                minVal = min(minVal, newVal)
+        return minVal
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
