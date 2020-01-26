@@ -175,8 +175,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
             gamestate_successor_move = gameState.generateSuccessor(0, action)
             next_state = gamestate_successor_move
             next_value = self.get_value(next_state, curr_depth, 1)
-            max_value = max(next_value, max_val)
-            if(max_value == next_value):
+            if(next_value >= max_val):
                 max_val = next_value
                 best_action = action
         return best_action
@@ -196,30 +195,30 @@ class MinimaxAgent(MultiAgentSearchAgent):
         return self.max_value(gameState, init_depth)
 
     def max_value(self, gameState, depth):
-        maxVal = -999999
+        max_val = -999999
         for action in gameState.getLegalActions(0):
             successor = gameState.generateSuccessor(0, action)
-            newVal = self.get_value(successor, depth, 1)
-            maxVal = max(maxVal, newVal)
-            if(newVal > maxVal):
-                maxVal = newVal
+            new_val = self.get_value(successor, depth, 1)
+            if(new_val > max_val):
+                max_val = new_val
                 continue
-            maxVal = maxVal
-        return maxVal
+        return max_val
 
-    def min_value(self, gameState, currentDepth, agntInd):
-        minVal = 999999
+    def min_value(self, gameState, currentDepth, agent):
+        min_val = 999999
         numAgents = gameState.getNumAgents() - 1
-        for action in gameState.getLegalActions(agntInd):
-            if agntInd == numAgents:
-                successor = gameState.generateSuccessor(agntInd, action)
-                newVal = self.get_value(successor, currentDepth + 1, 0)
-                minVal = min(minVal, newVal)
-                continue
-            successor = gameState.generateSuccessor(agntInd, action)
-            newVal = self.get_value(successor, currentDepth, agntInd + 1)
-            minVal = min(minVal, newVal)
-        return minVal
+        for action in gameState.getLegalActions(agent):
+            if agent == numAgents:
+                successor = gameState.generateSuccessor(agent, action)
+                new_val = self.get_value(successor, currentDepth + 1, 0)
+                if (new_val < min_val):
+                    min_val = new_val
+            else:
+                successor = gameState.generateSuccessor(agent, action)
+                new_val = self.get_value(successor, currentDepth, agent + 1)
+                if (new_val < min_val):
+                    min_val = new_val
+        return min_val
 
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
@@ -379,27 +378,27 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         return self.max_value(gameState, init_depth)
 
     def max_value(self, gameState, currentDepth):
-        maxVal = -999999
+        max_val = -999999
         for action in gameState.getLegalActions(0):
             successor = gameState.generateSuccessor(0, action)
-            newVal = self.get_value(successor, currentDepth, 1)
-            if (newVal > maxVal):
-                maxVal = newVal
-        return maxVal
+            new_val = self.get_value(successor, currentDepth, 1)
+            if (new_val > max_val):
+                max_val = new_val
+        return max_val
 
     def avg_value(self, gameState, currentDepth, agntInd):
-        avgVal = 0
+        avg_val = 0
         numAgents = gameState.getNumAgents() - 1
         for action in gameState.getLegalActions(agntInd):
             if agntInd == numAgents:
                 successor = gameState.generateSuccessor(agntInd, action)
-                newVal = self.get_value(successor, currentDepth + 1, 0)
-                avgVal += newVal
+                new_val = self.get_value(successor, currentDepth + 1, 0)
+                avg_val += new_val
             else:
                 successor = gameState.generateSuccessor(agntInd, action)
-                newVal = self.get_value(successor, currentDepth, agntInd + 1)
-                avgVal += newVal
-        return avgVal
+                new_val = self.get_value(successor, currentDepth, agntInd + 1)
+                avg_val += new_val
+        return avg_val
 
 def betterEvaluationFunction(currentGameState):
     """
