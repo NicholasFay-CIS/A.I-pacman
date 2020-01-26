@@ -13,6 +13,7 @@
 
 
 from util import manhattanDistance
+from collections import namedtuple
 from game import Directions
 import random, util
 
@@ -166,19 +167,21 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         
-        neg_infinity = -9999999
+        max_val = -9999999
         pac_man_actions = gameState.getLegalActions(0)
-        values = list()
+        best_action = None
         for action in pac_man_actions:
             curr_depth = 0
-            get_successor_move = gameState.generateSuccessor(0, action, curr_depth)
-            next_state = get_successor_move
-            next_value = self.get_value(next_state, 1, 0)
-            values.append(next_value)
-        return max(values)
+            gamestate_successor_move = gameState.generateSuccessor(0, action)
+            next_state = gamestate_successor_move
+            next_value = self.get_value(next_state, curr_depth, 1)
+            max_value = max(next_value, max_val)
+            if(max_value == next_value):
+                max_val = next_value
+                best_action = action
+        return best_action
 
-    def get_value(self, gameState, agent, init_depth):
-        from collections import namedtuple
+    def get_value(self, gameState, init_depth, agent):
         terminal_states = namedtuple('terminal', 'win lose')
         terminal_states.win = gameState.isWin()
         terminal_states.lose = gameState.isLose()
@@ -186,21 +189,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
             return self.evaluationFunction(gameState)
         if(terminal_states.lose == True):
             return self.evaluationFunction(gameState)
-        if(not self.depth):
+        if(init_depth == self.depth):
             return self.evaluationFunction(gameState)
         if(agent):
             return self.min_value(gameState, init_depth)
         return self.max_value(gameState, init_depth)
-
-    def max_value(self, gameState, depth):
-        maxVal = -999999
-        for action in gameState.getLegalActions(0):
-            successor = gameState.generateSuccessor(0, action)
-            newVal = self.get_value(successor, depth, 1)
-            maxVal = max(maxVal, newVal)
-        return maxVal
-
-
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
