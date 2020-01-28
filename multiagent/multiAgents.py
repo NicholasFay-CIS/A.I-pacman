@@ -283,9 +283,10 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         #get the legal actions of the game state for pacman
         legal_actions = gameState.getLegalActions(0)
         #iterate through the legal actions
-        for action in legal_actions:
+        i = 0
+        while (i < len(legal_actions)):
             #generate the value for a ghost
-            next_value = self.get_value(gameState.generateSuccessor(0, action), init_depth, 1, alpha, beta)
+            next_value = self.get_value(gameState.generateSuccessor(0, legal_actions[i]), init_depth, 1, alpha, beta)
             #find the max of our new value we just got and our stored max value 
             max_value = max(max_value, next_value)
             #check if our max value is greater than beta
@@ -296,6 +297,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             else:
                 #otherwise we found our max so return the max value 
                 return max_value
+            i += 1
         return max_value
 
     def min_value(self, gameState, init_depth, agent, alpha, beta):
@@ -306,11 +308,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         #get the legal actions
         legal_actions = gameState.getLegalActions(agent)
         #iterate through the legal actions 
-        for action in legal_actions:
+        i = 0
+        while(i < len(legal_actions)):
             #if the agent does not equal the number of agents
             if(agent != num_agents):
                 #get the successor state of the agent and the legal action
-                successor = gameState.generateSuccessor(agent, action)
+                successor = gameState.generateSuccessor(agent, legal_actions[i])
                 #get the value of the successor with the next agent
                 new_value = self.get_value(successor, init_depth, agent + 1, alpha, beta)
                 #set the min value to be the smallest value
@@ -321,10 +324,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 #if min value is less than beta updata beta
                 if(min_value < beta):
                     beta = min_value
+                i += 1
                 continue
             else:
                 #get successor state and action of the agent if it is the same number
-                successor = gameState.generateSuccessor(agent, action)
+                successor = gameState.generateSuccessor(agent, legal_actions[i])
                 #get the value by changing the depth count and use pacman as the agent
                 new_value = self.get_value(successor, init_depth + 1, 0, alpha, beta)
                 #get min value
@@ -335,6 +339,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 #update beta if neccessary
                 if(min_value < beta):
                     beta = min_value
+                i += 1
         return min_value
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
