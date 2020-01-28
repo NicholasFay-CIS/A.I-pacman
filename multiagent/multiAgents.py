@@ -169,12 +169,17 @@ class MinimaxAgent(MultiAgentSearchAgent):
         
         max_val = -9999999
         pac_man_actions = gameState.getLegalActions(0)
+        #best action is currently unknown
         best_action = None
+        #iterate through all possible actions for pacman
         for action in pac_man_actions:
             curr_depth = 0
+            #get the successor state using the action
             gamestate_successor_move = gameState.generateSuccessor(0, action)
             next_state = gamestate_successor_move
+            #get the value of the move
             next_value = self.get_value(next_state, curr_depth, 1)
+            #if the move has a greater value than the max, set it and its action to max/best
             if(next_value >= max_val):
                 max_val = next_value
                 best_action = action
@@ -184,19 +189,24 @@ class MinimaxAgent(MultiAgentSearchAgent):
         terminal_states = namedtuple('terminal', 'win lose')
         terminal_states.win = gameState.isWin()
         terminal_states.lose = gameState.isLose()
+        #check if state is a win or a terminal state
         if(terminal_states.win == True):
             return self.evaluationFunction(gameState)
         if(terminal_states.lose == True):
             return self.evaluationFunction(gameState)
         if(init_depth == self.depth):
             return self.evaluationFunction(gameState)
+        #if agent is not pacman, find the min value
         if(agent):
             return self.min_value(gameState, init_depth, agent)
+        #if agent is pacman, find the max value
         return self.max_value(gameState, init_depth)
 
     def max_value(self, gameState, depth):
         max_val = -999999
+        #iterate through actions for pacman
         for action in gameState.getLegalActions(0):
+            #look through pacmans successors and find the max value
             successor = gameState.generateSuccessor(0, action)
             new_val = self.get_value(successor, depth, 1)
             if(new_val > max_val):
@@ -206,15 +216,20 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
     def min_value(self, gameState, currentDepth, agent):
         min_val = 999999
+        #get the number of agents
         numAgents = gameState.getNumAgents() - 1
         for action in gameState.getLegalActions(agent):
             if agent == numAgents:
+                #iterate through the successors, checking the min value for each move
                 successor = gameState.generateSuccessor(agent, action)
+                #in this iteration, the last agent has been reached so increase the depth
                 new_val = self.get_value(successor, currentDepth + 1, 0)
                 if (new_val < min_val):
                     min_val = new_val
             else:
+                #iterate through the successors, checking the min value for each move
                 successor = gameState.generateSuccessor(agent, action)
+                #in this iteration, increment the agent to check their other moves
                 new_val = self.get_value(successor, currentDepth, agent + 1)
                 if (new_val < min_val):
                     min_val = new_val
@@ -358,9 +373,11 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         max_val = -9999999
         pac_man_actions = gameState.getLegalActions(0)
         best_action = None
+        #iterate through pacmans legal actions
         for action in pac_man_actions:
             curr_depth = 0
             gamestate_successor_move = gameState.generateSuccessor(0, action)
+            #get the value for each successor and check against the max
             new_value = self.get_value(gamestate_successor_move, curr_depth, 1)
             max_value = max(new_value, max_val)
             if(max_value == new_value):
@@ -372,21 +389,26 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         terminal_states = namedtuple('terminal', 'win lose')
         terminal_states.win = gameState.isWin()
         terminal_states.lose = gameState.isLose()
+        #check if state is terminal or a win
         if(terminal_states.win == True):
             return self.evaluationFunction(gameState)
         if(terminal_states.lose == True):
             return self.evaluationFunction(gameState)
         if(init_depth == self.depth):
             return self.evaluationFunction(gameState)
+        #if the agent is a ghost, find the average value
         if(agent):
             return self.avg_value(gameState, init_depth, agent)
+        #if the agent is pacman, find the max value
         return self.max_value(gameState, init_depth)
 
     def max_value(self, gameState, currentDepth):
         max_val = -999999
         for action in gameState.getLegalActions(0):
+            #check the value for each successor
             successor = gameState.generateSuccessor(0, action)
             new_val = self.get_value(successor, currentDepth, 1)
+            #check value against the amx
             if (new_val > max_val):
                 max_val = new_val
         return max_val
@@ -397,11 +419,15 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         for action in gameState.getLegalActions(agntInd):
             if agntInd == numAgents:
                 successor = gameState.generateSuccessor(agntInd, action)
+                #increment depth if you are at last agent
                 new_val = self.get_value(successor, currentDepth + 1, 0)
+                #increment average for each agent
                 avg_val += new_val
             else:
                 successor = gameState.generateSuccessor(agntInd, action)
+                #increment agent id until we reach the final one
                 new_val = self.get_value(successor, currentDepth, agntInd + 1)
+                #increment average for each agent
                 avg_val += new_val
         return avg_val
 
