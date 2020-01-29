@@ -67,41 +67,42 @@ class ReflexAgent(Agent):
         Print out these variables to see what you're getting, then combine them
         to create a masterful evaluation function.
         """
-        # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
         newPos = successorGameState.getPacmanPosition()
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
         "*** YOUR CODE HERE ***"
+        inf = 9999999
+        neg_inf = -9999999
         curPacman = currentGameState.getPacmanPosition()
         distFromFood = set()
         nextPacman = list(newPos)
         menu = newFood.asList()
+        i = 0
 
         if (action == "Stop"):
-           return -9999999
+           return neg_inf
 
         for mob in newGhostStates:
             ghost = mob.getPosition()
             currentGhostDist = manhattanDistance(ghost, curPacman)
             if (currentGhostDist < 1.0):
-                return -9999
+                return neg_inf
             nextGhostDist = manhattanDistance(newPos, ghost)
             if (nextGhostDist < 1.0):
-                return -9999
-        for food in menu:
-            #numFood = currentGameState.getNumFood()
-            #newNumFood = successorGameState.getNumFood()
-            curFoodDist = manhattanDistance(curPacman, food)
-            nextFoodDist = manhattanDistance(nextPacman, food)
+                return neg_inf
+        while(i < len(menu)):
+            curFoodDist = manhattanDistance(curPacman, menu[i])
+            nextFoodDist = manhattanDistance(nextPacman, menu[i])
             val = curFoodDist - nextFoodDist
             numfood = currentGameState.getNumFood()
             newNumFood = successorGameState.getNumFood()
             if (numfood > newNumFood):
-                return 9999
+                return inf
             else:
                 distFromFood.add(val)
+            i += 1
         try:
             return min(distFromFood)
         except:
@@ -166,73 +167,86 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        
-        max_val = -9999999
+        neg_inf = -9999999
+        max_val = neg_inf
         pac_man_actions = gameState.getLegalActions(0)
         #best action is currently unknown
         best_action = None
         #iterate through all possible actions for pacman
-        for action in pac_man_actions:
+        i = 0
+        while(i < len(pac_man_actions)):
             curr_depth = 0
             #get the successor state using the action
-            gamestate_successor_move = gameState.generateSuccessor(0, action)
+            gamestate_successor_move = gameState.generateSuccessor(0, pac_man_actions[i])
             next_state = gamestate_successor_move
             #get the value of the move
             next_value = self.get_value(next_state, curr_depth, 1)
             #if the move has a greater value than the max, set it and its action to max/best
             if(next_value >= max_val):
                 max_val = next_value
-                best_action = action
+                best_action = pac_man_actions[i]
+            i += 1
         return best_action
 
-    def get_value(self, gameState, init_depth, agent):
+    def get_value(self, game_state, init_depth, agent):
         terminal_states = namedtuple('terminal', 'win lose')
-        terminal_states.win = gameState.isWin()
-        terminal_states.lose = gameState.isLose()
+        terminal_states.win = game_state.isWin()
+        terminal_states.lose = game_state.isLose()
         #check if state is a win or a terminal state
         if(terminal_states.win == True):
-            return self.evaluationFunction(gameState)
+            return self.evaluationFunction(game_state)
         if(terminal_states.lose == True):
-            return self.evaluationFunction(gameState)
+            return self.evaluationFunction(game_state)
         if(init_depth == self.depth):
-            return self.evaluationFunction(gameState)
+            return self.evaluationFunction(game_state)
         #if agent is not pacman, find the min value
         if(agent):
-            return self.min_value(gameState, init_depth, agent)
+            return self.min_value(game_state, init_depth, agent)
         #if agent is pacman, find the max value
-        return self.max_value(gameState, init_depth)
+        return self.max_value(game_state, init_depth)
 
-    def max_value(self, gameState, depth):
-        max_val = -999999
+    def max_value(self, game_state, depth):
+        neg_inf = -999999
+        max_val = neg_inf
         #iterate through actions for pacman
-        for action in gameState.getLegalActions(0):
+        legal_actions = game_state.getLegalActions(0)
+        i = 0
+        while(i < len(legal_actions)):
             #look through pacmans successors and find the max value
-            successor = gameState.generateSuccessor(0, action)
+            successor = game_state.generateSuccessor(0, legal_actions[i])
             new_val = self.get_value(successor, depth, 1)
             if(new_val > max_val):
                 max_val = new_val
+                i += 1
                 continue
+            i += 1
         return max_val
 
-    def min_value(self, gameState, currentDepth, agent):
-        min_val = 999999
+    def min_value(self, game_state, init_depth, agent):
+        inf = 999999
+        min_val = inf
         #get the number of agents
-        numAgents = gameState.getNumAgents() - 1
-        for action in gameState.getLegalActions(agent):
-            if agent == numAgents:
+        agent_count = game_state.getNumAgents() - 1
+        legal_actions = game_state.getLegalActions(agent)
+        i = 0
+        while(i < len(legal_actions)):
+            if agent == agent_count:
                 #iterate through the successors, checking the min value for each move
-                successor = gameState.generateSuccessor(agent, action)
+                successor = game_state.generateSuccessor(agent, legal_actions[i])
                 #in this iteration, the last agent has been reached so increase the depth
-                new_val = self.get_value(successor, currentDepth + 1, 0)
+                new_depth = init_depth + 1
+                new_val = self.get_value(successor, new_depth, 0)
                 if (new_val < min_val):
                     min_val = new_val
             else:
                 #iterate through the successors, checking the min value for each move
-                successor = gameState.generateSuccessor(agent, action)
+                successor = game_state.generateSuccessor(agent, legal_actions[i])
                 #in this iteration, increment the agent to check their other moves
-                new_val = self.get_value(successor, currentDepth, agent + 1)
+                next_agent = agent + 1
+                new_val = self.get_value(successor, init_depth, next_agent)
                 if (new_val < min_val):
                     min_val = new_val
+            i += 1
         return min_val
 
 
@@ -256,10 +270,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         #set beta to inf so we can find the min
         min_b = inf
         legal_actions = gameState.getLegalActions(0)
+        i = 0
         #iterate through all the legal gamestate actions 
-        for action in legal_actions:
+        while(i < len(legal_actions)):
             #get the successor state
-            next_state = gameState.generateSuccessor(0, action)
+            next_state = gameState.generateSuccessor(0, legal_actions[i])
             #get the value of that state
             next_value = self.get_value(next_state, 0, 1, max_a, min_b)
             #find the max
@@ -267,9 +282,10 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             #if the next state yields the max value
             if(max_value == next_value):
                 #that is the best action so far
-                best_action = action
+                best_action = legal_actions[i]
             #adjust the alpha var according to the max value and current alpha
             max_a = max(max_a, max_value)
+            i += 1
         return best_action
 
     def get_value(self, gameState, init_depth, agent, alpha, beta):
@@ -330,7 +346,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 #get the successor state of the agent and the legal action
                 successor = gameState.generateSuccessor(agent, legal_actions[i])
                 #get the value of the successor with the next agent
-                new_value = self.get_value(successor, init_depth, agent + 1, alpha, beta)
+                next_agent = agent + 1
+                new_value = self.get_value(successor, init_depth, next_agent, alpha, beta)
                 #set the min value to be the smallest value
                 min_value = min(min_value, new_value)
                 #if min value is less than alpha then we have our min value
@@ -345,7 +362,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 #get successor state and action of the agent if it is the same number
                 successor = gameState.generateSuccessor(agent, legal_actions[i])
                 #get the value by changing the depth count and use pacman as the agent
-                new_value = self.get_value(successor, init_depth + 1, 0, alpha, beta)
+                new_depth = init_depth + 1
+                new_value = self.get_value(successor, new_depth, 0, alpha, beta)
                 #get min value
                 min_value = min(min_value, new_value)
                 #if alpha is greater than our value return we have the min value
@@ -370,19 +388,22 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        max_val = -9999999
+        neg_inf = -9999999
+        max_val = neg_inf
         pac_man_actions = gameState.getLegalActions(0)
         best_action = None
+        i = 0
         #iterate through pacmans legal actions
-        for action in pac_man_actions:
+        while(i < len(pac_man_actions)):
             curr_depth = 0
-            gamestate_successor_move = gameState.generateSuccessor(0, action)
+            gamestate_successor_move = gameState.generateSuccessor(0, pac_man_actions[i])
             #get the value for each successor and check against the max
             new_value = self.get_value(gamestate_successor_move, curr_depth, 1)
             max_value = max(new_value, max_val)
             if(max_value == new_value):
                 max_val = new_value
-                best_action = action
+                best_action = pac_man_actions[i]
+            i += 1
         return best_action
 
     def get_value(self, gameState, init_depth, agent):
@@ -398,38 +419,48 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             return self.evaluationFunction(gameState)
         #if the agent is a ghost, find the average value
         if(agent):
-            return self.avg_value(gameState, init_depth, agent)
+            return self.exp_value(gameState, init_depth, agent)
         #if the agent is pacman, find the max value
         return self.max_value(gameState, init_depth)
 
-    def max_value(self, gameState, currentDepth):
-        max_val = -999999
-        for action in gameState.getLegalActions(0):
+    def max_value(self, game_state, init_depth):
+        neg_inf = -999999
+        max_val = neg_inf
+        legal_actions = game_state.getLegalActions(0)
+        i = 0
+        while(i < len(legal_actions)):
             #check the value for each successor
-            successor = gameState.generateSuccessor(0, action)
-            new_val = self.get_value(successor, currentDepth, 1)
-            #check value against the amx
-            if (new_val > max_val):
+            successor = game_state.generateSuccessor(0, legal_actions[i])
+            new_val = self.get_value(successor, init_depth, 1)
+            #check value against the max
+            max_ = max(new_val, max_val)
+            if (new_val == max_):
                 max_val = new_val
+            i += 1
         return max_val
 
-    def avg_value(self, gameState, currentDepth, agntInd):
-        avg_val = 0
-        numAgents = gameState.getNumAgents() - 1
-        for action in gameState.getLegalActions(agntInd):
-            if agntInd == numAgents:
-                successor = gameState.generateSuccessor(agntInd, action)
+    def exp_value(self, game_state, init_depth, agent):
+        exp_val = 0
+        numAgents = game_state.getNumAgents() - 1
+        legal_actions = game_state.getLegalActions(agent)
+        i = 0
+        while(i < len(legal_actions)):
+            if agent == numAgents:
+                successor = game_state.generateSuccessor(agent, legal_actions[i])
                 #increment depth if you are at last agent
-                new_val = self.get_value(successor, currentDepth + 1, 0)
+                next_depth = init_depth + 1
+                new_val = self.get_value(successor, next_depth, 0)
                 #increment average for each agent
-                avg_val += new_val
+                exp_val += new_val
             else:
-                successor = gameState.generateSuccessor(agntInd, action)
+                successor = game_state.generateSuccessor(agent, legal_actions[i])
                 #increment agent id until we reach the final one
-                new_val = self.get_value(successor, currentDepth, agntInd + 1)
+                next_agent = agent + 1
+                new_val = self.get_value(successor, init_depth, next_agent)
                 #increment average for each agent
-                avg_val += new_val
-        return avg_val
+                exp_val += new_val
+            i += 1
+        return exp_val
 
 def betterEvaluationFunction(currentGameState):
     """
