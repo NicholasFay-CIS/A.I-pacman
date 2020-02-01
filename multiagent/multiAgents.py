@@ -201,26 +201,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
             return self.evaluationFunction(game_state)
         #if agent is not pacman, find the min value
         if(agent):
-            return self.min_value(game_state, init_depth, agent)
+            min_value = self.min_value(game_state, init_depth, agent)
+            return min_value
         #if agent is pacman, find the max value
-        return self.max_value(game_state, init_depth)
-
-    def max_value(self, game_state, depth):
-        neg_inf = -999999
-        max_val = neg_inf
-        #iterate through actions for pacman
-        legal_actions = game_state.getLegalActions(0)
-        i = 0
-        while(i < len(legal_actions)):
-            #look through pacmans successors and find the max value
-            successor = game_state.generateSuccessor(0, legal_actions[i])
-            new_val = self.get_value(successor, depth, 1)
-            if(new_val > max_val):
-                max_val = new_val
-                i += 1
-                continue
-            i += 1
-        return max_val
+        max_value = self.max_value(game_state, init_depth)
+        return max_value
 
     def min_value(self, game_state, init_depth, agent):
         inf = 999999
@@ -249,6 +234,22 @@ class MinimaxAgent(MultiAgentSearchAgent):
             i += 1
         return min_val
 
+    def max_value(self, game_state, depth):
+        neg_inf = -999999
+        max_val = neg_inf
+        #iterate through actions for pacman
+        legal_actions = game_state.getLegalActions(0)
+        i = 0
+        while(i < len(legal_actions)):
+            #look through pacmans successors and find the max value
+            successor = game_state.generateSuccessor(0, legal_actions[i])
+            new_val = self.get_value(successor, depth, 1)
+            if(new_val > max_val):
+                max_val = new_val
+                i += 1
+                continue
+            i += 1
+        return max_val
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -303,32 +304,10 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             return self.evaluationFunction(gameState)
         #if the agent is not pacman
         if(agent):
-            return self.min_value(gameState, init_depth, agent, alpha, beta)
+            min_value = self.min_value(gameState, init_depth, agent, alpha, beta)
+            return min_value
         #otherwise it is pacman
-        return self.max_value(gameState, init_depth, alpha, beta)
-
-    def max_value(self, gameState, init_depth, alpha, beta):
-        neg_inf = -999999
-        #to find our max we compare initially against neg inf
-        max_value = neg_inf
-        #get the legal actions of the game state for pacman
-        legal_actions = gameState.getLegalActions(0)
-        #iterate through the legal actions
-        i = 0
-        while (i < len(legal_actions)):
-            #generate the value for a ghost
-            next_value = self.get_value(gameState.generateSuccessor(0, legal_actions[i]), init_depth, 1, alpha, beta)
-            #find the max of our new value we just got and our stored max value 
-            max_value = max(max_value, next_value)
-            #check if our max value is greater than beta
-            is_greater = max(max_value, beta)
-            if(is_greater == beta):
-                #if beta is greater update alpha
-                alpha = max(alpha, max_value)
-            else:
-                #otherwise we found our max so return the max value 
-                return max_value
-            i += 1
+        max_value = self.max_value(gameState, init_depth, alpha, beta)
         return max_value
 
     def min_value(self, gameState, init_depth, agent, alpha, beta):
@@ -375,6 +354,30 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 i += 1
         return min_value
 
+    def max_value(self, gameState, init_depth, alpha, beta):
+        neg_inf = -999999
+        #to find our max we compare initially against neg inf
+        max_value = neg_inf
+        #get the legal actions of the game state for pacman
+        legal_actions = gameState.getLegalActions(0)
+        #iterate through the legal actions
+        i = 0
+        while (i < len(legal_actions)):
+            #generate the value for a ghost
+            next_value = self.get_value(gameState.generateSuccessor(0, legal_actions[i]), init_depth, 1, alpha, beta)
+            #find the max of our new value we just got and our stored max value 
+            max_value = max(max_value, next_value)
+            #check if our max value is greater than beta
+            is_greater = max(max_value, beta)
+            if(is_greater == beta):
+                #if beta is greater update alpha
+                alpha = max(alpha, max_value)
+            else:
+                #otherwise we found our max so return the max value 
+                return max_value
+            i += 1
+        return max_value
+
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (question 4)
@@ -406,38 +409,24 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             i += 1
         return best_action
 
-    def get_value(self, gameState, init_depth, agent):
+    def get_value(self, game_state, init_depth, agent):
         terminal_states = namedtuple('terminal', 'win lose')
-        terminal_states.win = gameState.isWin()
-        terminal_states.lose = gameState.isLose()
+        terminal_states.win = game_state.isWin()
+        terminal_states.lose = game_state.isLose()
         #check if state is terminal or a win
         if(terminal_states.win == True):
-            return self.evaluationFunction(gameState)
+            return self.evaluationFunction(game_state)
         if(terminal_states.lose == True):
-            return self.evaluationFunction(gameState)
+            return self.evaluationFunction(game_state)
         if(init_depth == self.depth):
-            return self.evaluationFunction(gameState)
+            return self.evaluationFunction(game_state)
         #if the agent is a ghost, find the average value
         if(agent):
-            return self.exp_value(gameState, init_depth, agent)
+            exp_value = self.exp_value(game_state, init_depth, agent)
+            return exp_value
         #if the agent is pacman, find the max value
-        return self.max_value(gameState, init_depth)
-
-    def max_value(self, game_state, init_depth):
-        neg_inf = -999999
-        max_val = neg_inf
-        legal_actions = game_state.getLegalActions(0)
-        i = 0
-        while(i < len(legal_actions)):
-            #check the value for each successor
-            successor = game_state.generateSuccessor(0, legal_actions[i])
-            new_val = self.get_value(successor, init_depth, 1)
-            #check value against the max
-            max_ = max(new_val, max_val)
-            if (new_val == max_):
-                max_val = new_val
-            i += 1
-        return max_val
+        max_value = self.max_value(game_state, init_depth)
+        return max_value
 
     def exp_value(self, game_state, init_depth, agent):
         exp_val = 0
@@ -459,8 +448,25 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
                 new_val = self.get_value(successor, init_depth, next_agent)
                 #increment average for each agent
                 exp_val += new_val
+            #go to the next index
             i += 1
         return exp_val
+    
+    def max_value(self, game_state, init_depth):
+        neg_inf = -999999
+        max_val = neg_inf
+        legal_actions = game_state.getLegalActions(0)
+        i = 0
+        while(i < len(legal_actions)):
+            #check the value for each successor
+            successor = game_state.generateSuccessor(0, legal_actions[i])
+            new_val = self.get_value(successor, init_depth, 1)
+            #check value against the max
+            max_ = max(new_val, max_val)
+            if (new_val == max_):
+                max_val = new_val
+            i += 1
+        return max_val
 
 def betterEvaluationFunction(currentGameState):
     """
