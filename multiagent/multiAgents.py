@@ -467,9 +467,85 @@ def betterEvaluationFunction(currentGameState):
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION: "Prioritize eating the closest food, chasing down scared ghosts, and avoiding nearby ghosts"
     """
     "*** YOUR CODE HERE ***"
+    #get pacman location
+    pacman = currentGameState.getPacmanPosition()
+    #get location of food
+    food = currentGameState.getFood()
+    menu = food.asList()
+    #get location of ghosts and times of scared ghosts
+    newGhostStates = currentGameState.getGhostStates()
+    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+
+    #return value "Most Effective Tactics Available"
+    meta = 0
+    #determine the closest food as well as distance to it
+    closestFood = 0
+    pacDistFromFood = 9999
+    for food in menu:
+        foodDist = manhattanDistance(food, pacman)
+        if foodDist < pacDistFromFood:
+            closestFood = food
+            pacDistFromFood = foodDist
+    
+    if (closestFood):
+        #recalculate distance...
+        #if far away from nearest food, change direction to get closer
+        if (pacDistFromFood > 7):
+           # meta += closestCap * .2
+            meta -= pacDistFromFood 
+        #if nearby food, keep going until you can eat
+        elif (pacDistFromFood <= 3):
+            meta += pacDistFromFood * .75 
+        else:
+            meta -= pacDistFromFood * .25
+       
+    for time in newScaredTimes:
+        ghost = newScaredTimes.index(time)
+        #location of ghost
+        scaredGhost = newGhostStates[ghost].getPosition()
+        #calculate distance from scared ghost and pacman
+        scaredDist = manhattanDistance(pacman, scaredGhost)
+        if time:
+            #if the ghost is scared and right in front of you, you might as well get it
+            if scaredDist == 1:
+                return 9999999
+            elif scaredDist <= 2:
+                #very close to the ghost, keep going
+                meta += scaredDist * 900
+                return meta
+            elif scaredDist <= 4:
+                #very close to the ghost, keep going
+                meta += scaredDist * 400
+                return meta
+            elif scaredDist <= 9:
+                #try to catch it
+                meta += scaredDist * 50
+        else:
+            #you can travel freely while a ghost is scared
+            meta += scaredDist
+
+    #now if the ghosts are not scared...
+    for mob in newGhostStates:
+        #get ghost position and calculate distance
+        ghost = mob.getPosition()
+        dist = manhattanDistance(ghost, pacman)
+        #if (ghostDist > dist):
+         #   ghostDist = dist
+        if (max(newScaredTimes) == 0):
+            if (dist <= 2):
+                #if the ghost is nearby, get out of there
+                meta -=  dist * 10
+            else:
+                #you have time, move freely
+                meta += dist * .25
+
+        meta += currentGameState.data.score * .5
+
+    return meta
+
 
 # Abbreviation
 better = betterEvaluationFunction
