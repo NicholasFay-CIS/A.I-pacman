@@ -484,6 +484,7 @@ def betterEvaluationFunction(currentGameState):
     #get location of ghosts and times of scared ghosts
     newGhostStates = currentGameState.getGhostStates()
     newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+    curScore = currentGameState.data.score * .5
 
     #return value "Most Effective Tactics Available"
     meta = 0
@@ -544,6 +545,7 @@ def betterEvaluationFunction(currentGameState):
                 #you have time, move freely
                 meta += dist * .25
 
+    meta += curScore
     return meta
 
 
