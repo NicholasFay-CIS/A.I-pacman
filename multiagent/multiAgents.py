@@ -277,7 +277,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             #get the successor state
             next_state = gameState.generateSuccessor(0, legal_actions[i])
             #get the value of that state
-            next_value = self.get_value(next_state, 1, 0, max_a, min_b)
+            next_value = self.get_value(next_state, max_a, min_b, 1, 0)
             #find the max
             max_value = max(next_value, max_value)
             #if the next state yields the max value
@@ -289,7 +289,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             i += 1
         return best_action
 
-    def get_value(self, gameState,  agent, init_depth, alpha, beta):
+    def get_value(self, gameState,  alpha, beta, agent, init_depth):
         terminal_states = namedtuple('terminal', 'win lose')
         terminal_states.win = gameState.isWin()
         terminal_states.lose = gameState.isLose()
@@ -304,13 +304,13 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             return self.evaluationFunction(gameState)
         #if the agent is not pacman
         if(agent):
-            min_value = self.min_value(gameState, agent, init_depth,  alpha, beta)
+            min_value = self.min_value(gameState, alpha, beta, agent, init_depth)
             return min_value
         #otherwise it is pacman
-        max_value = self.max_value(gameState, init_depth, alpha, beta)
+        max_value = self.max_value(gameState, alpha, beta, init_depth)
         return max_value
 
-    def min_value(self, gameState, agent, init_depth, alpha, beta):
+    def min_value(self, gameState, alpha, beta, agent, init_depth):
         inf = 999999
         min_value = inf
         #get the agents, minus one due to indexing concerns 
@@ -326,7 +326,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 successor = gameState.generateSuccessor(agent, legal_actions[i])
                 #get the value of the successor with the next agent
                 next_agent = agent + 1
-                new_value = self.get_value(successor, next_agent, init_depth,  alpha, beta)
+                new_value = self.get_value(successor, alpha, beta, next_agent, init_depth)
                 #set the min value to be the smallest value
                 min_value = min(min_value, new_value)
                 #if min value is less than alpha then we have our min value
@@ -342,7 +342,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 successor = gameState.generateSuccessor(agent, legal_actions[i])
                 #get the value by changing the depth count and use pacman as the agent
                 new_depth = init_depth + 1
-                new_value = self.get_value(successor, 0, new_depth,  alpha, beta)
+                new_value = self.get_value(successor, alpha, beta, 0, new_depth)
                 #get min value
                 min_value = min(min_value, new_value)
                 #if alpha is greater than our value return we have the min value
@@ -354,7 +354,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                 i += 1
         return min_value
 
-    def max_value(self, gameState, init_depth, alpha, beta):
+    def max_value(self, gameState, alpha, beta, init_depth):
         neg_inf = -999999
         #to find our max we compare initially against neg inf
         max_value = neg_inf
@@ -364,7 +364,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         i = 0
         while (i < len(legal_actions)):
             #generate the value for a ghost
-            next_value = self.get_value(gameState.generateSuccessor(0, legal_actions[i]), 1, init_depth, alpha, beta)
+            next_value = self.get_value(gameState.generateSuccessor(0, legal_actions[i]),  alpha, beta, 1, init_depth)
             #find the max of our new value we just got and our stored max value 
             max_value = max(max_value, next_value)
             #check if our max value is greater than beta
