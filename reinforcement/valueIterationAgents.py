@@ -150,9 +150,27 @@ class AsynchronousValueIterationAgent(ValueIterationAgent):
               mdp.isTerminal(state)
         """
         ValueIterationAgent.__init__(self, mdp, discount, iterations)
-
     def runValueIteration(self):
         "*** YOUR CODE HERE ***"
+        #list of all the states
+        states = self.mdp.getStates()
+        #the amount of iterations to consider
+        iterations = self.iterations
+        for i in range(iterations):
+            stateIndex = i % len(states)
+            #the current state at iteration i
+            curState = states[stateIndex]
+            if self.mdp.isTerminal(curState):
+                continue
+            actions = self.mdp.getPossibleActions(curState)
+            maxVal = -9999999
+            for action in actions:
+                #find which action results with the maximum q value
+                qVal = self.getQValue(curState, action)
+                maxVal = max(maxVal, qVal)
+            self.values[curState] = maxVal
+
+
 
 class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
     """
@@ -173,4 +191,53 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
 
     def runValueIteration(self):
         "*** YOUR CODE HERE ***"
+        pQueue = util.PriorityQueue()
+        allStates = self.mdp.getStates()
+        iterations = self.iterations
+        visitedStates = {}
+
+        for state in allStates:
+            maxVal = -9999999
+            if self.mdp.isTerminal(state):
+                continue
+            actions = self.mdp.getPossibleActions(state)
+            for action in actions:
+                prevStates = self.mdp.getTransitionStatesAndProbs(state, action)
+                for pS, prob in prevStates:
+                    if pS not in visitedStates:
+                        visitedStates[pS] = {state}
+                    else:
+                        visitedStates[pS].add(state)
+        
+                tempVal = self.computeQValueFromValues(state, action)
+                maxVal = max(maxVal, tempVal)
+            diff = -1 * abs(self.values[state] - maxVal)
+            pQueue.update(state, diff)
+
+        for i in range(iterations):
+            if pQueue.isEmpty():
+                break
+            state = pQueue.pop()
+            if self.mdp.isTerminal(state):
+                continue
+            else:
+                maxVal = -9999999
+                for action in self.mdp.getPossibleActions(state):
+                    tempVal = self.computeQValueFromValues(state, action)
+                    maxVal = max(maxVal, tempVal)
+                self.values[state] = maxVal
+            for vState in visitedStates[state]:
+                if self.mdp.isTerminal(vState):
+                    continue
+                maxVal = -9999999
+                for action in self.mdp.getPossibleActions(vState):
+                    tempVal = self.computeQValueFromValues(vState, action)
+                    maxVal = max(maxVal, tempVal)
+
+                diff = abs(self.values[vState] - maxVal)
+                if diff > self.theta:
+                    diff = diff * -1
+                    pQueue.update(vState, diff)
+                
+
 
