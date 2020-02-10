@@ -107,12 +107,12 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         """*** YOUR CODE HERE ***
         TEST MORE!!!!!!! """
-        
         policy = util.Counter()
         pos_actions = self.mdp.getPossibleActions(state)
         for i in range(0, len(pos_actions)):
             policy[pos_actions[i]] = self.getQValue(state, pos_actions[i])
-        return policy.argMax()
+        best_args = policy.argMax()
+        return best_args
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
