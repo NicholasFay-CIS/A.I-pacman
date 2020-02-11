@@ -55,7 +55,9 @@ class QLearningAgent(ReinforcementAgent):
         """
         "*** YOUR CODE HERE ***"
         #needs review
-        return self.values[(state,action)]
+        value_i = (state,action)
+        values = self.values[value_i]
+        return values
 
 
     def computeValueFromQValues(self, state):
@@ -66,7 +68,15 @@ class QLearningAgent(ReinforcementAgent):
           terminal state, you should return a value of 0.0.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        max_v = float("-inf")
+        actions = self.getLegalActions(state)
+        for i in range(0, len(actions)):
+          next_qval = self.getQValue(state, actions[i])
+          max_var = max(next_qval, max_v)
+          if(max_var != next_qval):
+            continue
+          max_v = next_qval
+        return max_v
 
     def computeActionFromQValues(self, state):
         """
@@ -75,8 +85,19 @@ class QLearningAgent(ReinforcementAgent):
           you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        max_v = float("-inf")
+        optimal_a = 0
+        actions = self.getLegalActions(state)
+        for i in range(0, len(actions)):
+          next_qval = self.getQValue(state, actions[i])
+          max_var = max(next_qval, max_v)
+          if(max_var != next_qval):
+            continue
+          max_v = next_qval
+          optimal_a = actions[i]
+        return optimal_a
 
+          
     def getAction(self, state):
         """
           Compute the action to take in the current state.  With
