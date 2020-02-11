@@ -97,7 +97,6 @@ class QLearningAgent(ReinforcementAgent):
           optimal_a = actions[i]
         return optimal_a
 
-          
     def getAction(self, state):
         """
           Compute the action to take in the current state.  With
@@ -111,11 +110,16 @@ class QLearningAgent(ReinforcementAgent):
         """
         # Pick Action
         legalActions = self.getLegalActions(state)
+        coin_flip = util.flipCoin(self.epsilon)
         action = None
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-
-
+        if(legalActions):
+          if(not coin_flip):
+            action = random.choice(legalActions)
+            return action
+          action = self.getPolicy(state)
+        return action
+        
     def update(self, state, action, nextState, reward):
         """
           The parent class calls this to observe a
