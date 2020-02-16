@@ -125,9 +125,6 @@ class QLearningAgent(ReinforcementAgent):
 
         return random.choice(legalActions)
 
-
-        
-
     def update(self, state, action, nextState, reward):
         """
           The parent class calls this to observe a
