@@ -151,27 +151,31 @@ class AsynchronousValueIterationAgent(ValueIterationAgent):
               mdp.isTerminal(state)
         """
         ValueIterationAgent.__init__(self, mdp, discount, iterations)
+
     def runValueIteration(self):
         "*** YOUR CODE HERE ***"
-        #list of all the states
+        neg_inf = -9999999
+        #get all the states
         states = self.mdp.getStates()
-        #the amount of iterations to consider
+        #get all the iterations
         iterations = self.iterations
         for i in range(iterations):
             stateIndex = i % len(states)
-            #the current state at iteration i
+            #retrieve the current state at the ith iteration
             curState = states[stateIndex]
+            #check for terminal state
             if self.mdp.isTerminal(curState):
                 continue
+            #get all the actions for the current state
             actions = self.mdp.getPossibleActions(curState)
-            maxVal = -9999999
+            maxVal = neg_inf
+            #iterate through all the possible actions
             for action in actions:
-                #find which action results with the maximum q value
+                #find which action is the best 
                 qVal = self.getQValue(curState, action)
                 maxVal = max(maxVal, qVal)
             self.values[curState] = maxVal
-
-
+        return
 
 class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
     """
