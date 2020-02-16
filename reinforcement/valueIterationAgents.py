@@ -108,11 +108,11 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        policy = util.Counter()
+        pol = util.Counter()
         pos_actions = self.mdp.getPossibleActions(state)
         for i in range(0, len(pos_actions)):
-            policy[pos_actions[i]] = self.getQValue(state, pos_actions[i])
-        best_args = policy.argMax()
+            pol[pos_actions[i]] = self.getQValue(state, pos_actions[i])
+        best_args = pol.argMax()
         return best_args
 
     def getPolicy(self, state):
@@ -199,7 +199,7 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
         pQueue = util.PriorityQueue()
         allStates = self.mdp.getStates()
         iterations = self.iterations
-        visitedStates = {}
+        visitedStates = dict()
 
         for state in allStates:
             maxVal = -9999999
