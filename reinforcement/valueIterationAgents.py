@@ -107,7 +107,7 @@ class ValueIterationAgent(ValueEstimationAgent):
           there are no legal actions, which is the case at the
           terminal state, you should return None.
         """
-        """*** YOUR CODE HERE ***"""
+        "*** YOUR CODE HERE ***"
         policy = util.Counter()
         pos_actions = self.mdp.getPossibleActions(state)
         for i in range(0, len(pos_actions)):
